@@ -1,6 +1,5 @@
 import { reactive } from '../reactive'
 import { effect, stop } from '../effect'
-import exp from 'constants'
 describe('effect', () => {
 	it('happy path', () => {
 		const user = reactive({

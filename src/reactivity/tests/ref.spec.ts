@@ -1,5 +1,5 @@
 import { effect } from '../effect'
-import { reactive } from '../reactive'
+
 import { isRef, proxyRefs, ref, unRef } from '../ref'
 
 describe('ref', () => {
@@ -43,7 +43,7 @@ describe('ref', () => {
 	})
 
 	it('should work without initial value', () => {
-		const a = ref()
+		const a = ref(undefined)
 		let dummy
 		effect(() => {
 			dummy = a.value
