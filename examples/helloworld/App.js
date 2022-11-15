@@ -1,31 +1,35 @@
-import { h } from '../../lib/my-mini-vue.esm.js'
+import { h, createTextVNode } from '../../lib/my-mini-vue.esm.js'
 import { Foo } from './Foo.js'
 
-window.self = null
 export const App = {
 	// .vue
 	// <template></template>
 	// render
 	render() {
-		window.self = this
+		const app = h('div', {}, 'hi, ' + this.msg)
+		// vnode
+		// const foo = h(Foo, {}, h('p', {}, '_slot_single_'))
+		// 数组
+		// const foo = h(Foo, {}, [h('p', {}, '_slot_array_1_'), h('p', {}, '_slot_array_2_')])
+		// 具名插槽
+		const foo = h(
+			Foo,
+			{},
+			{
+				header: ({ age }) => [
+					h('p', {}, '_slot_array_1_' + age),
+					createTextVNode('textNode')
+				],
+				footer: () => h('p', {}, '_slot_array_2_')
+			}
+		)
 		return h(
 			'div',
 			{
 				id: 'root',
 				class: ['red', 'hard']
 			},
-			[
-				h('div', {}, 'hi, ' + this.msg),
-				h(Foo, {
-					count: 1,
-					onAdd() {
-						console.log('on Add')
-					},
-					onAddFoo() {
-						console.log('onAddFoo')
-					}
-				})
-			]
+			[app, foo]
 			// setupState
 			// 'hello world,' + this.msg
 			// Array

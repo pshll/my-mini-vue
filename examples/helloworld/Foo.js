@@ -1,26 +1,40 @@
-import { h } from '../../lib/my-mini-vue.esm.js'
+import { h, renderSlot } from '../../lib/my-mini-vue.esm.js'
 
 export const Foo = {
 	setup(props, { emit }) {
 		// props.count
 		// props ==> shallow readonly
-		const emitAdd = () => {
-			emit('add')
-			emit('add-foo', 1, 2)
-		}
-		return {
-			emitAdd
-		}
+		// const emitAdd = () => {
+		// 	emit('add')
+		// 	emit('add-foo', 1, 2)
+		// }
+		// return {
+		// 	emitAdd
+		// }
+		return {}
 	},
 	render() {
-		const btn = h(
-			'button',
-			{
-				onClick: this.emitAdd
-			},
-			'emitAdd'
-		)
-		const foo = h('div', {}, 'foo:' + this.count)
-		return h('div', {}, [foo, btn])
+		// 作用域插槽
+		const age = 18
+		// const btn = h(
+		// 	'button',
+		// 	{
+		// 		onClick: this.emitAdd
+		// 	},
+		// 	'emitAdd'
+		// )
+		// const foo = h('div', {}, 'foo:' + this.count)
+		// return h('div', {}, [foo, btn])
+		const foo = h('p', {}, 'foo')
+		// return h('div', {}, [foo, h('div',{},this.$slots)])
+		// 指定元素渲染位置
+		return h('div', {}, [
+			// 具名插槽
+			renderSlot(this.$slots, 'header', {
+				age
+			}),
+			foo,
+			renderSlot(this.$slots, 'footer')
+		])
 	}
 }
