@@ -1,36 +1,36 @@
 import { h, ref } from '../../lib/my-mini-vue.esm.js'
 
-const isChange = ref(false)
+const isChange = ref(true)
 
 // 1. 左侧的对比
 // (a b) c
 // (a b) d e
 // const prevChildren = [
-//   h("p", { key: "A" }, "A"),
-//   h("p", { key: "B" }, "B"),
-//   h("p", { key: "C" }, "C"),
-// ];
+// 	h('p', { key: 'A' }, 'A'),
+// 	h('p', { key: 'B' }, 'B'),
+// 	h('p', { key: 'C' }, 'C')
+// ]
 // const nextChildren = [
-//   h("p", { key: "A" }, "A"),
-//   h("p", { key: "B" }, "B"),
-//   h("p", { key: "D" }, "D"),
-//   h("p", { key: "E" }, "E"),
-// ];
+// 	h('p', { key: 'A' }, 'A'),
+// 	h('p', { key: 'B' }, 'B'),
+// 	h('p', { key: 'D' }, 'D'),
+// 	h('p', { key: 'E' }, 'E')
+// ]
 
 // 2. 右侧的对比
 // a (b c)
 // d e (b c)
 // const prevChildren = [
-//   h("p", { key: "A" }, "A"),
-//   h("p", { key: "B" }, "B"),
-//   h("p", { key: "C" }, "C"),
-// ];
+// 	h('p', { key: 'A' }, 'A'),
+// 	h('p', { key: 'B' }, 'B'),
+// 	h('p', { key: 'C' }, 'C')
+// ]
 // const nextChildren = [
-//   h("p", { key: "D" }, "D"),
-//   h("p", { key: "E" }, "E"),
-//   h("p", { key: "B" }, "B"),
-//   h("p", { key: "C" }, "C"),
-// ];
+// 	h('p', { key: 'D' }, 'D'),
+// 	h('p', { key: 'E' }, 'E'),
+// 	h('p', { key: 'B' }, 'B'),
+// 	h('p', { key: 'C' }, 'C')
+// ]
 
 // 3. 新的比老的长
 //     创建新的
@@ -38,23 +38,23 @@ const isChange = ref(false)
 // (a b)
 // (a b) c
 // i = 2, e1 = 1, e2 = 2
-// const prevChildren = [h("p", { key: "A" }, "A"), h("p", { key: "B" }, "B")];
+// const prevChildren = [h('p', { key: 'A' }, 'A'), h('p', { key: 'B' }, 'B')]
 // const nextChildren = [
-//   h("p", { key: "A" }, "A"),
-//   h("p", { key: "B" }, "B"),
-//   h("p", { key: "C" }, "C"),
-// ];
+// 	h('p', { key: 'A' }, 'A'),
+// 	h('p', { key: 'B' }, 'B'),
+// 	h('p', { key: 'C' }, 'C')
+// ]
 
 // 右侧
 // (a b)
 // c (a b)
 // i = 0, e1 = -1, e2 = 0
-// const prevChildren = [h("p", { key: "A" }, "A"), h("p", { key: "B" }, "B")];
+// const prevChildren = [h('p', { key: 'A' }, 'A'), h('p', { key: 'B' }, 'B')]
 // const nextChildren = [
-//   h("p", { key: "C" }, "C"),
-//   h("p", { key: "A" }, "A"),
-//   h("p", { key: "B" }, "B"),
-// ];
+// 	h('p', { key: 'C' }, 'C'),
+// 	h('p', { key: 'A' }, 'A'),
+// 	h('p', { key: 'B' }, 'B')
+// ]
 
 // 4. 老的比新的长
 //     删除老的
@@ -63,23 +63,23 @@ const isChange = ref(false)
 // (a b)
 // i = 2, e1 = 2, e2 = 1
 // const prevChildren = [
-//   h("p", { key: "A" }, "A"),
-//   h("p", { key: "B" }, "B"),
-//   h("p", { key: "C" }, "C"),
-// ];
-// const nextChildren = [h("p", { key: "A" }, "A"), h("p", { key: "B" }, "B")];
+// 	h('p', { key: 'A' }, 'A'),
+// 	h('p', { key: 'B' }, 'B'),
+// 	h('p', { key: 'C' }, 'C')
+// ]
+// const nextChildren = [h('p', { key: 'A' }, 'A'), h('p', { key: 'B' }, 'B')]
 
 // 右侧
 // a (b c)
 // (b c)
 // i = 0, e1 = 0, e2 = -1
 
-// const prevChildren = [
-//   h("p", { key: "A" }, "A"),
-//   h("p", { key: "B" }, "B"),
-//   h("p", { key: "C" }, "C"),
-// ];
-// const nextChildren = [h("p", { key: "B" }, "B"), h("p", { key: "C" }, "C")];
+const prevChildren = [
+	h('p', { key: 'A' }, 'A'),
+	h('p', { key: 'B' }, 'B'),
+	h('p', { key: 'C' }, 'C')
+]
+const nextChildren = [h('p', { key: 'B' }, 'B'), h('p', { key: 'C' }, 'C')]
 
 // 5. 对比中间的部分
 // 删除老的  (在老的里面存在，新的里面不存在)
@@ -188,24 +188,24 @@ const isChange = ref(false)
 // a,b,(c,e),f,g
 // a,b,(e,c,d),f,g
 // d 节点在老的节点中不存在，新的里面存在，所以需要创建
-const prevChildren = [
-	h('p', { key: 'A' }, 'A'),
-	h('p', { key: 'B' }, 'B'),
-	h('p', { key: 'C' }, 'C'),
-	h('p', { key: 'E' }, 'E'),
-	h('p', { key: 'F' }, 'F'),
-	h('p', { key: 'G' }, 'G')
-]
+// const prevChildren = [
+// 	h('p', { key: 'A' }, 'A'),
+// 	h('p', { key: 'B' }, 'B'),
+// 	h('p', { key: 'C' }, 'C'),
+// 	h('p', { key: 'E' }, 'E'),
+// 	h('p', { key: 'F' }, 'F'),
+// 	h('p', { key: 'G' }, 'G')
+// ]
 
-const nextChildren = [
-	h('p', { key: 'A' }, 'A'),
-	h('p', { key: 'B' }, 'B'),
-	h('p', { key: 'E' }, 'E'),
-	h('p', { key: 'C' }, 'C'),
-	h('p', { key: 'D' }, 'D'),
-	h('p', { key: 'F' }, 'F'),
-	h('p', { key: 'G' }, 'G')
-]
+// const nextChildren = [
+// 	h('p', { key: 'A' }, 'A'),
+// 	h('p', { key: 'B' }, 'B'),
+// 	h('p', { key: 'E' }, 'E'),
+// 	h('p', { key: 'C' }, 'C'),
+// 	h('p', { key: 'D' }, 'D'),
+// 	h('p', { key: 'F' }, 'F'),
+// 	h('p', { key: 'G' }, 'G')
+// ]
 
 export default {
 	name: 'PatchChildren',
@@ -217,6 +217,7 @@ export default {
 				{
 					onClick: () => {
 						isChange.value = !isChange.value
+						console.log(isChange.value)
 					}
 				},
 				'测试子组件之间的 patch 逻辑'
