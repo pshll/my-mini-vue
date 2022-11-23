@@ -100,7 +100,7 @@ export function createRenderer(options) {
 				mountChildren(c2, container, parentComponent, anchor)
 			}
 
-			// array diff array
+			// diff 双端对比diff算法
 			patchKeyedChildren(c1, c2, container, parentComponent, anchor)
 		}
 	}
@@ -171,6 +171,109 @@ export function createRenderer(options) {
 			while (i <= e1) {
 				hostRemove(c1[i].el)
 				i++
+			}
+		}
+
+		// 5. unknown sequence
+		// [i ... e1 + 1]: a b [c d] f g
+		// [i ... e2 + 1]: a b [e c] f g
+		// i = 2, e1 = 3, e2 = 3
+		// [i ... e1 + 1]: a b [c d e] f g
+		// [i ... e2 + 1]: a b [e d c h] f g
+		// i = 2, e1 = 4, e2 = 5
+		else {
+			const s1 = i
+			const s2 = i
+
+			// 5.1 build key:index map for newChildren
+			const keyToNewIndexMap = new Map()
+			for (i = s2; i <= e2; i++) {
+				const nextChild = c2[i]
+				if (nextChild.key) {
+					keyToNewIndexMap.set(nextChild.key, i)
+				}
+			}
+
+			let j
+			// 当前处理了的数量
+			let patched = 0
+			// 新节点的数量
+			const toBePatched = e2 - s2 + 1
+
+			let moved = false
+			// used to track whether any node has moved
+			let maxNewIndexSoFar = 0
+			// works as Map<newIndex, oldIndex>
+			// Note that oldIndex is offset by +1
+			// and oldIndex = 0 is a special value indicating the new node has
+			// no corresponding old node.
+			// used for determining longest stable subsequence
+			const newIndexToOldIndexMap = new Array(toBePatched)
+			for (i = 0; i < toBePatched; i++) newIndexToOldIndexMap[i] = 0
+
+			for (i = s1; i <= e1; i++) {
+				const prevChild = c1[i]
+
+				if (patched >= toBePatched) {
+					// all new children have been patched so this can only be a removal
+					hostRemove(prevChild.el)
+					continue
+				}
+
+				let newIndex
+				if (prevChild.key != null) {
+					newIndex = keyToNewIndexMap.get(prevChild.key)
+				} else {
+					// key-less node, try to locate a key-less node of the same type
+					for (j = s2; j <= e2; j++) {
+						if (
+							newIndexToOldIndexMap[j - s2] === 0 &&
+							isSameVNodeType(prevChild, c2[j])
+						) {
+							newIndex = j
+							break
+						}
+					}
+				}
+
+				if (newIndex === undefined) {
+					hostRemove(prevChild.el)
+				} else {
+					// 记录位置
+					newIndexToOldIndexMap[newIndex - s2] = i + 1
+					if (newIndex >= maxNewIndexSoFar) {
+						maxNewIndexSoFar = newIndex
+					} else {
+						moved = true
+					}
+					patch(prevChild, c2[newIndex], container, parentComponent, null)
+					patched++
+				}
+			}
+
+			// 5.3 move and mount
+			// 最长递增子序列
+			const increasingNewIndexSequence = moved ? getSequence(newIndexToOldIndexMap) : []
+			j = increasingNewIndexSequence.length - 1
+
+			for (let i = toBePatched - 1; i >= 0; i--) {
+				const nextIndex = i + s2
+				const nextChild = c2[nextIndex]
+				const anchor = nextIndex + 1 < l2 ? c2[nextIndex + 1].el : parentAnchor
+
+				if (newIndexToOldIndexMap[i] === 0) {
+					// mount new
+					patch(null, nextChild, container, parentComponent, anchor)
+				} else if (moved) {
+					// move if:
+					// There is no stable subsequence (e.g. a reverse)
+					// OR current node is not among the stable sequence
+					if (j < 0 || i !== increasingNewIndexSequence[j]) {
+						hostInsert(nextChild.el, container, anchor)
+					} else {
+						j--
+					}
+				}
 			}
 		}
 	}
@@ -267,4 +370,46 @@ export function createRenderer(options) {
 	}
 
 	return { createApp: createAppAPI(render) }
+}
+
+// https://en.wikipedia.org/wiki/Longest_increasing_subsequence
+function getSequence(arr: number[]): number[] {
+	const p = arr.slice()
+	const result = [0]
+	let i, j, u, v, c
+	const len = arr.length
+	for (i = 0; i < len; i++) {
+		const arrI = arr[i]
+		if (arrI !== 0) {
+			j = result[result.length - 1]
+			if (arr[j] < arrI) {
+				p[i] = j
+				result.push(i)
+				continue
+			}
+			u = 0
+			v = result.length - 1
+			while (u < v) {
+				c = (u + v) >> 1
+				if (arr[result[c]] < arrI) {
+					u = c + 1
+				} else {
+					v = c
+				}
+			}
+			if (arrI < arr[result[u]]) {
+				if (u > 0) {
+					p[i] = result[u - 1]
+				}
+				result[u] = i
+			}
+		}
+	}
+	u = result.length
+	v = result[u - 1]
+	while (u-- > 0) {
+		result[u] = v
+		v = p[v]
+	}
+	return result
 }
