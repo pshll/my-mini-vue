@@ -6,11 +6,13 @@ export const Text = Symbol('Text')
 export function createVNode(type, props?, children?) {
 	const vnode = {
 		type,
+		key: props && props.key,
+		el: null,
 		props,
 		children,
-		key: props && props.key,
-		shapeFlag: getShapeFlag(type),
-		el: null
+		component: null,
+		next: null,
+		shapeFlag: getShapeFlag(type)
 	}
 
 	if (typeof children === 'string') {
