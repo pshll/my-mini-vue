@@ -5,6 +5,7 @@ import { createComponentInstance, setupComponent } from './component'
 import { shouldUpdateComponent } from './componentRenderUtils'
 import { createAppAPI } from './createApp'
 import { Fragment, Text } from './createVNode'
+import { queueJobs } from './scheduler'
 
 export function createRenderer(options) {
 	const {
@@ -369,7 +370,7 @@ export function createRenderer(options) {
 	}
 
 	function setupRenderEffect(instance: any, initialVNode, container, anchor) {
-		instance.update = effect(() => {
+		function componentUpdateFn() {
 			if (!instance.isMounted) {
 				const { proxy } = instance
 				const subTree = (instance.subTree = instance.render.call(proxy))
@@ -397,7 +398,16 @@ export function createRenderer(options) {
 
 				patch(prevSubTree, subTree, container, instance, anchor)
 			}
-		})
+		}
+		// instance.update
+		const effectFn = (instance.effect = effect(componentUpdateFn, {
+			scheduler: () => {
+				// effect 推到微任务的时候再执行
+				queueJobs(update)
+			}
+		}))
+		const update: any = (instance.update = () => effectFn())
+		update.id = instance.uid
 	}
 
 	function updateComponentPreRender(instance, nextVNode) {

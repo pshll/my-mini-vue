@@ -7,8 +7,11 @@ import { initSlots } from './componentSlots'
 
 let currentInstance = null
 
+let uid = 0
+
 export function createComponentInstance(vnode, parent) {
 	const instance = {
+		uid: uid++,
 		vnode,
 		type: vnode.type,
 		setupState: {},
