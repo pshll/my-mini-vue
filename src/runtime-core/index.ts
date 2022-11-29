@@ -1,7 +1,10 @@
 export { h } from './h'
 export { renderSlot } from './helpers/renderSlot'
-export { createTextVNode } from './createVNode'
-export { getCurrentInstance } from './component'
+export { createTextVNode, createElementVNode } from './createVNode'
+export { getCurrentInstance, registerRuntimeCompiler } from './component'
 export { provide, inject } from './apiInject'
 export { createRenderer } from './render'
 export { nextTick } from './scheduler'
+export { toDisplayString } from '../shared'
+
+export * from '../reactivity'

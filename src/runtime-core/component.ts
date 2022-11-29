@@ -1,5 +1,6 @@
 import { proxyRefs } from '../reactivity'
 import { shallowReadonly } from '../reactivity/reactive'
+import { NOOP } from '../shared'
 import { emit } from './componentEmit'
 import { initProps } from './componentProps'
 import { PublicInstanceProxyHandlers } from './componentPublicInstance'
@@ -8,6 +9,8 @@ import { initSlots } from './componentSlots'
 let currentInstance = null
 
 let uid = 0
+
+let compile
 
 export function createComponentInstance(vnode, parent) {
 	const instance = {
@@ -69,8 +72,17 @@ function handleSetupResult(instance, setupResult) {
 function finishComponentSetup(instance: any) {
 	const Component = instance.type
 
-	if (Component.render) {
-		instance.render = Component.render
+	// template / render function normalization
+	// could be already set when returned from setup()
+	if (!instance.render) {
+		if (compile && !Component.render) {
+			// template
+			if (Component.template) {
+				const template = Component.template
+				Component.render = compile(template)
+			}
+		}
+		instance.render = Component.render || NOOP
 	}
 }
 
@@ -80,4 +92,12 @@ export function getCurrentInstance() {
 
 export function setCurrentInstace(instance) {
 	currentInstance = instance
+}
+
+/**
+ * For runtime-dom to register the compiler.
+ * Note the exported method uses any to avoid d.ts relying on the compiler types.
+ */
+export function registerRuntimeCompiler(_compile: any) {
+	compile = _compile
 }

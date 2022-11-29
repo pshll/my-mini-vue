@@ -2,9 +2,9 @@ import { effect } from '../reactivity/effect'
 import { EMPTY_OBJ } from '../shared'
 import { ShapeFlags } from '../shared/ShapeFlags'
 import { createComponentInstance, setupComponent } from './component'
-import { shouldUpdateComponent } from './componentRenderUtils'
+import { renderComponentRoot, shouldUpdateComponent } from './componentRenderUtils'
 import { createAppAPI } from './createApp'
-import { Fragment, Text } from './createVNode'
+import { Fragment, normalizeVNode, Text } from './createVNode'
 import { queueJobs } from './scheduler'
 
 export function createRenderer(options) {
@@ -372,8 +372,7 @@ export function createRenderer(options) {
 	function setupRenderEffect(instance: any, initialVNode, container, anchor) {
 		function componentUpdateFn() {
 			if (!instance.isMounted) {
-				const { proxy } = instance
-				const subTree = (instance.subTree = instance.render.call(proxy))
+				const subTree: any = (instance.subTree = renderComponentRoot(instance))
 
 				patch(null, subTree, container, instance, anchor)
 
@@ -389,12 +388,8 @@ export function createRenderer(options) {
 					updateComponentPreRender(instance, next)
 				}
 
-				const { proxy } = instance
 				const prevSubTree = instance.subTree
-				const subTree = instance.render.call(proxy)
-
-				// 更新subTree
-				instance.subTree = subTree
+				const subTree = (instance.subTree = renderComponentRoot(instance))
 
 				patch(prevSubTree, subTree, container, instance, anchor)
 			}

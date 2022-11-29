@@ -1,3 +1,5 @@
+import { normalizeVNode } from './createVNode'
+
 export function shouldUpdateComponent(prevVNode, nextVNode) {
 	// 只有props更新时 才更新组件
 	const { props: prevProps } = prevVNode
@@ -27,4 +29,12 @@ function hasPropsChanged(prevProps, nextProps) {
 		}
 	}
 	return false
+}
+
+export function renderComponentRoot(instance) {
+	let result
+	const { proxy } = instance
+	const proxyToUse = proxy
+	result = normalizeVNode(instance.render.call(proxyToUse, proxyToUse))
+	return result
 }

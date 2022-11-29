@@ -1,9 +1,17 @@
+export * from './toDisplayString'
+
 export const extend = Object.assign
 
 export const EMPTY_OBJ = {}
 
+export const NOOP = () => {}
+
 export const isObject = (val) => {
 	return val !== null && typeof val === 'object'
+}
+
+export const isString = (val) => {
+	return typeof val === 'string'
 }
 
 export const hasChanged = (value: any, oldValue: any): Boolean => {

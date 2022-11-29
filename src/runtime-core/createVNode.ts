@@ -3,6 +3,8 @@ import { ShapeFlags } from '../shared/ShapeFlags'
 export const Fragment = Symbol('Fragment')
 export const Text = Symbol('Text')
 
+export { createVNode as createElementVNode }
+
 export function createVNode(type, props?, children?) {
 	const vnode = {
 		type,
@@ -37,4 +39,13 @@ export function createTextVNode(text: string) {
 
 function getShapeFlag(type) {
 	return typeof type === 'string' ? ShapeFlags.ELEMENT : ShapeFlags.STATEFUL_COMPONENT
+}
+
+// 让child支持多个格式
+export function normalizeVNode(child) {
+	if (typeof child === 'string' || typeof child === 'number') {
+		return createVNode(Text, null, String(child))
+	} else {
+		return child
+	}
 }
