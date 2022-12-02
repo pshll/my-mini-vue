@@ -5,19 +5,20 @@ import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 
 export default {
-	input: './src/index.ts',
+	// input: './src/index.ts',
+	input: './packages/vue/src/index.ts',
 	output: [
 		// 1.cjs -> commonjs
 		// 2.esm -> es6
 		{
 			format: 'cjs',
-			file: 'lib/my-mini-vue.cjs.js'
+			file: 'packages/vue/dist/my-mini-vue.cjs.js'
 			// file: pkg.main
 		},
 		{
 			format: 'es',
 			// file: pkg.module
-			file: 'lib/my-mini-vue.esm.js'
+			file: 'packages/vue/dist/my-mini-vue.esm.js'
 		}
 	],
 	plugins: [commonjs(), typescript(), json(), resolve()],
